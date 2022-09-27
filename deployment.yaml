@@ -7,7 +7,7 @@ metadata:
   labels:
     app: test-site
 spec:
-  replicas: 2
+  replicas: 1
   progressDeadlineSeconds: 600
   revisionHistoryLimit: 2
   strategy:
@@ -21,28 +21,26 @@ spec:
         app: test-site
     spec:
       initContainers:
-      - image: k8s.gcr.io/git-sync:v3.1.5
-        name: init-sync
-        volumeMounts:
-        - name: html
-          mountPath: /tmp/git
-        env:
-        - name: GIT_SYNC_REPO
-          value: https://github.com/jonje/test-site.git 
-        - name: GIT_SYNC_BRANCH
-          value: main
-        - name: GIT_SYNC_DEPTH
-          value: "1"
-        - name: GIT_SYNC_DEST
-          value: "html"
-        - name: GIT_SYNC_ONE_TIME
-          value: "true"
       containers:
         - name: test-site
           image: nginx:latest
           volumeMounts:
           - name: html
             mountPath: /usr/share/nginx
+        - image: k8s.gcr.io/git-sync:v3.1.5
+          name: init-sync
+          volumeMounts:
+          - name: html
+            mountPath: /tmp/git
+          env:
+          - name: GIT_SYNC_REPO
+            value: https://github.com/jonje/test-site.git 
+          - name: GIT_SYNC_BRANCH
+            value: main
+          - name: GIT_SYNC_DEPTH
+            value: "1"
+          - name: GIT_SYNC_DEST
+            value: "html"
       volumes:
       - name: html
         emptyDir: {}

@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: test-site-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`www.test-site.local.haknet.org`)
+      kind: Rule 
+      services:
+        - name: nginx
+          port: 80
+    - match: Host(`test-site.local.haknet.org`)
+      kind: Rule
+      services:
+        - name: test-site-service
+          port: 80
+      middlewares:
+        - name: default-headers
+  # tls:
+  #   secretName: local-haknet-org-tls
